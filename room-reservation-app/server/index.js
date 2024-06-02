@@ -1,25 +1,46 @@
-// server/index.js
+// index.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
+
+// Import routes
+const userRouter = require('./routes/user');
+
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/room-reservation', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-app.listen(5000, () => {
-  console.log('Server running on port 5000');
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/room-reservation', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('Connection error', error);
 });
-// server/index.js
-const userRouter = require('./routes/user');
-const roomRouter = require('./routes/room');
-const reservationRouter = require('./routes/reservation');
-
+const roomsRoute = require('./routes/rooms');
+const reservationsRoute = require('./routes/reservations');
+// Use routes
 app.use('/api/users', userRouter);
-app.use('/api/rooms', roomRouter);
-app.use('/api/reservations', reservationRouter);
+// Use routes
+app.use('/api/rooms', roomsRoute);
+app.use('/api/reservations', reservationsRoute);
+
+
+
+// Start server
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+// Serve React app
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../client/build')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
