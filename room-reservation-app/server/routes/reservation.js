@@ -2,6 +2,7 @@
 const express = require('express');
 const Reservation = require('../models/Reservation');
 const router = express.Router();
+const authenticate = require('./user').authenticate;
 
 
 router.use(authenticate);
