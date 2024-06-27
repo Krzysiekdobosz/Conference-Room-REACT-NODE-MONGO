@@ -27,7 +27,7 @@ The Conference Room Booking application allows users to browse available rooms, 
 1. **Backend**
     - Navigate to the backend directory:
       ```bash
-      cd backend
+      cd serwer
       ```
     - Install dependencies:
       ```bash
@@ -47,7 +47,7 @@ The Conference Room Booking application allows users to browse available rooms, 
 2. **Frontend**
     - Navigate to the frontend directory:
       ```bash
-      cd frontend
+      cd klient
       ```
     - Install dependencies:
       ```bash
