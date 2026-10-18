@@ -1,67 +1,80 @@
-# Conference Room Booking
+# RoomBook – Conference Room Booking
 
-## Table of Contents
-- [Project Description](#project-description)
-- [Technologies](#technologies)
-- [Features](#features)
-- [Running the Project](#running-the-project)
-- [Configuration](#configuration)
+Web application for booking conference rooms. Users can browse rooms, check their schedule and availability, book a time slot and manage their reservations. Administrators manage rooms and all reservations.
 
-## Project Description
-The Conference Room Booking application allows users to browse available rooms, check their availability, and make reservations. The project is built using the MERN stack, which includes MongoDB for the database, Express.js and Node.js for the server, and React.js for the frontend.
+**Live demo:** https://krzysiekdobosz.github.io/Conference-Room-REACT-NODE-MONGO/
 
-## Technologies
-- **MongoDB**: NoSQL database.
-- **Express.js**: Framework for Node.js to create the server and API.
-- **React.js**: Library for building the user interface.
-- **Node.js**: JavaScript runtime environment for the server side.
+The demo runs entirely in the browser with test data (no server needed). Test accounts:
+
+| Role  | Email               | Password   |
+| ----- | ------------------- | ---------- |
+| User  | `user@example.com`  | `user123`  |
+| Admin | `admin@example.com` | `admin123` |
 
 ## Features
-- User registration and login
-- Browsing available conference rooms
-- Checking room availability for specific dates
-- Making reservations
-- Admin management of reservations
 
-## Running the Project
-1. **Backend**
-    - Navigate to the backend directory:
-      ```bash
-      cd server
-      ```
-    - Install dependencies:
-      ```bash
-      npm install
-      ```
-    - Create a `.env` file in the backend directory and add the following environment variables:
-      ```
-      MONGO_URI=your_mongodb_uri
-      JWT_SECRET=your_jwt_secret
-      PORT=5000
-      ```
-    - Start the server:
-      ```bash
-      npm start
-      ```
+- Registration and login with JWT
+- Room list with capacity filter and availability search for a chosen time range
+- Daily schedule of every room with a visual timeline
+- Booking with validation (no overlapping reservations, no bookings in the past, max 12 hours)
+- "My reservations" view with cancellation
+- Admin panel: add, edit and delete rooms, view and cancel any reservation
+- Responsive layout with automatic dark mode
 
-2. **Frontend**
-    - Navigate to the frontend directory:
-      ```bash
-      cd client
-      ```
-    - Install dependencies:
-      ```bash
-      npm install
-      ```
-    - Create a `.env` file in the frontend directory and add the following environment variables:
-      ```
-      REACT_APP_API_URL=http://localhost:5000
-      ```
-    - Start the application:
-      ```bash
-      npm start
-      ```
+## Tech stack
 
-## Configuration
-1. **MongoDB**: Ensure you have MongoDB installed. You can use MongoDB Atlas to host your database in the cloud.
-2. **Environment Variables**: Configure the appropriate environment variables in the `.env` files.
+- **Client:** React 18, React Router, Vite
+- **Server:** Node.js, Express, Mongoose, JSON Web Tokens, bcrypt
+- **Database:** MongoDB
+
+## Project structure
+
+```
+room-reservation-app/
+├── client/          React application (Vite)
+│   └── src/api/     HTTP client and the in-browser mock used by the demo
+└── server/          REST API (Express + MongoDB)
+```
+
+## Running locally
+
+Requirements: Node.js 18+ and a running MongoDB instance.
+
+```bash
+# server
+cd room-reservation-app/server
+cp .env.example .env
+npm install
+npm run seed      # sample rooms, reservations and the test accounts above
+npm run dev       # http://localhost:5000
+
+# client (in a second terminal)
+cd room-reservation-app/client
+npm install
+npm run dev       # http://localhost:5173, /api is proxied to the server
+```
+
+To run only the demo version locally: `npm run build:demo && npm run preview -- --mode demo`. `npm run deploy:demo` publishes it to the `gh-pages` branch.
+
+## API
+
+| Method | Endpoint                          | Access | Description                                |
+| ------ | --------------------------------- | ------ | ------------------------------------------ |
+| POST   | `/api/auth/register`              | public | Create an account                          |
+| POST   | `/api/auth/login`                 | public | Log in, returns a JWT                      |
+| GET    | `/api/auth/me`                    | user   | Current user                               |
+| GET    | `/api/rooms?minCapacity&from&to`  | public | Rooms, optionally with availability        |
+| GET    | `/api/rooms/:id/schedule?date`    | public | Reservations of a room on a given day      |
+| POST   | `/api/rooms`                      | admin  | Create a room                              |
+| PUT    | `/api/rooms/:id`                  | admin  | Update a room                              |
+| DELETE | `/api/rooms/:id`                  | admin  | Delete a room and its reservations         |
+| GET    | `/api/reservations?all=true`      | user   | Own reservations (`all` – admins only)     |
+| POST   | `/api/reservations`               | user   | Book a room                                |
+| DELETE | `/api/reservations/:id`           | user   | Cancel own reservation (admins: any)       |
+
+## Tests
+
+```bash
+cd room-reservation-app/server && npm test
+cd room-reservation-app/client && npm test
+```
